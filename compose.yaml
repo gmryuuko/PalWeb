@@ -1,0 +1,6 @@
+﻿services:
+  palworldgm:
+    image: palworldgm
+    build:
+      context: .
+      dockerfile: Web/Dockerfile
