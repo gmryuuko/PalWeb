@@ -2,6 +2,7 @@
 @using Web.Services
 
 @inject PalService PalService
+@inject ISnackbar Snackbar
 
 <PageTitle>Home</PageTitle>
 
@@ -26,6 +27,13 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        _serverInfo = await PalService.GetServerInfoAsync();
+        try
+        {
+            _serverInfo = await PalService.GetServerInfoAsync();
+        }
+        catch (Exception e)
+        {
+            Snackbar.Add(e.Message, Severity.Error);
+        }
     }
 }

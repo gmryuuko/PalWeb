@@ -1,0 +1,21 @@
+@page "/announce"
+@using Web.Services
+@inject PalService PalService
+
+<PageTitle>Announce</PageTitle>
+<MudContainer>
+    <MudText Typo="Typo.h3" GutterBottom="true">Announce</MudText>
+    <MudTextField @bind-Value="_announcement" Label="Announcement" Variant="Variant.Outlined"/>
+    <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="SendAnnouncement">Send</MudButton>
+</MudContainer>
+
+@code {
+    private string _announcement = string.Empty;
+
+    private async Task SendAnnouncement()
+    {
+        await PalService.Announce(_announcement);
+        _announcement = string.Empty;
+    }
+
+}
