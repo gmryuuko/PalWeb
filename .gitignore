@@ -6,3 +6,5 @@ riderModule.iml
 .idea
 
 Web/appsettings.Secrets.json
+
+*.DotSettings.user

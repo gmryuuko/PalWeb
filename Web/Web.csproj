@@ -5,6 +5,7 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+    <RazorLangVersion>8.0</RazorLangVersion>
   </PropertyGroup>
 
 
@@ -18,4 +19,5 @@
       <Link>.dockerignore</Link>
     </Content>
   </ItemGroup>
+  
 </Project>

@@ -1,7 +1,14 @@
 using MudBlazor.Services;
 using Web.Components;
+using Web.Configurations;
+using Web.Services;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Configuration.AddJsonFile("appsettings.Secrets.json", optional: true, reloadOnChange: true);
+builder.Services.Configure<PalServiceOptions>(builder.Configuration.GetSection("PalService"));
+
+builder.Services.AddHttpClient<PalService>();
 
 // Add MudBlazor services
 builder.Services.AddMudServices();
