@@ -11,6 +11,7 @@ public class PalService
 {
     private readonly HttpClient _httpClient;
     private readonly string _host;
+    private readonly string _configPath;
 
     public PalService(HttpClient httpClient, IOptions<PalServiceOptions> options)
     {
@@ -18,6 +19,7 @@ public class PalService
         _host = options.Value.Url;
         var authHeader = BasicAuthHelper.GetBasicAuthHeader(options.Value.Username, options.Value.Password);
         _httpClient.DefaultRequestHeaders.Authorization = authHeader;
+        _configPath = Path.Join(options.Value.Root, "Saved/Config/LinuxServer/PalWorldSettings.ini");
     }
 
     private string GetUrl(string path) => $"{_host}/{path}";
@@ -83,74 +85,105 @@ public class PalService
         }
     }
 
-    public async Task<PalWorldSettings> GetPalWorldSettingsAsync()
+    public async Task<PalWorldSettings> GetActivePalWorldSettingsAsync()
     {
         return (await _httpClient.GetFromJsonAsync<PalWorldSettings>(GetUrl("v1/api/settings")))!;
+    }
+
+    public async Task<string> GetPalWorldSettingsAsync()
+    {
+        return await File.ReadAllTextAsync(_configPath);
     }
 }
 
 public class PalServerInfo
 {
-    [JsonPropertyName("version")] public string Version { get; set; } = "";
+    [JsonPropertyName("version")]
+    public string Version { get; set; } = "";
 
-    [JsonPropertyName("servername")] public string ServerName { get; set; } = "";
+    [JsonPropertyName("servername")]
+    public string ServerName { get; set; } = "";
 
-    [JsonPropertyName("description")] public string Description { get; set; } = "";
+    [JsonPropertyName("description")]
+    public string Description { get; set; } = "";
 
-    [JsonPropertyName("worldguid")] public string WorldGuid { get; set; } = "";
+    [JsonPropertyName("worldguid")]
+    public string WorldGuid { get; set; } = "";
 }
 
 public class PalServerMetrics
 {
-    [JsonPropertyName("currentplayernum")] public int CurrentPlayerNum { get; set; }
+    [JsonPropertyName("currentplayernum")]
+    public int CurrentPlayerNum { get; set; }
 
     [JsonPropertyName("serverfps")]
     public double ServerFps => 1000.0 / ServerFrameTime;
 
-    [JsonPropertyName("serverframetime")] public double ServerFrameTime { get; set; }
-    [JsonPropertyName("days")] public int Days { get; set; }
-    [JsonPropertyName("maxplayernum")] public int MaxPlayerNum { get; set; }
-    [JsonPropertyName("uptime")] public int Uptime { get; set; }
+    [JsonPropertyName("serverframetime")]
+    public double ServerFrameTime { get; set; }
+
+    [JsonPropertyName("days")]
+    public int Days { get; set; }
+
+    [JsonPropertyName("maxplayernum")]
+    public int MaxPlayerNum { get; set; }
+
+    [JsonPropertyName("uptime")]
+    public int Uptime { get; set; }
 }
 
 public class PlayerList
 {
-    [JsonPropertyName("players")] public List<PlayerInfo> Players { get; set; } = [];
+    [JsonPropertyName("players")]
+    public List<PlayerInfo> Players { get; set; } = [];
 }
 
 public class PlayerInfo
 {
-    [JsonPropertyName("name")] public string Name { get; set; } = "";
+    [JsonPropertyName("name")]
+    public string Name { get; set; } = "";
 
-    [JsonPropertyName("accountName")] public string AccountName { get; set; } = "";
+    [JsonPropertyName("accountName")]
+    public string AccountName { get; set; } = "";
 
-    [JsonPropertyName("playerId")] public string PlayerId { get; set; } = "";
+    [JsonPropertyName("playerId")]
+    public string PlayerId { get; set; } = "";
 
-    [JsonPropertyName("userId")] public string UserId { get; set; } = "";
+    [JsonPropertyName("userId")]
+    public string UserId { get; set; } = "";
 
-    [JsonPropertyName("ip")] public string Ip { get; set; } = "";
+    [JsonPropertyName("ip")]
+    public string Ip { get; set; } = "";
 
-    [JsonPropertyName("ping")] public double Ping { get; set; }
+    [JsonPropertyName("ping")]
+    public double Ping { get; set; }
 
-    [JsonPropertyName("location_x")] public double LocationX { get; set; }
+    [JsonPropertyName("location_x")]
+    public double LocationX { get; set; }
 
-    [JsonPropertyName("location_y")] public double LocationY { get; set; }
+    [JsonPropertyName("location_y")]
+    public double LocationY { get; set; }
 
-    [JsonPropertyName("level")] public int Level { get; set; }
+    [JsonPropertyName("level")]
+    public int Level { get; set; }
 
-    [JsonPropertyName("building_count")] public int BuildingCount { get; set; }
+    [JsonPropertyName("building_count")]
+    public int BuildingCount { get; set; }
 }
 
 public class KickPlayerRequest
 {
-    [JsonPropertyName("userid")] public string UserId { get; set; }
+    [JsonPropertyName("userid")]
+    public string UserId { get; set; }
 
-    [JsonPropertyName("message")] public string Message { get; set; }
+    [JsonPropertyName("message")]
+    public string Message { get; set; }
 }
 
 public class AnnounceRequest
 {
-    [JsonPropertyName("message")] public string Message { get; set; }
+    [JsonPropertyName("message")]
+    public string Message { get; set; }
 }
 
 public class PalWorldSettings

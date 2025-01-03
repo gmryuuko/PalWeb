@@ -12,9 +12,10 @@
     }
     else
     {
-        <MudText Typo="Typo.body1">ServerName: @_settings.ServerName</MudText>
-        <MudText Typo="Typo.body1">ServerDescription: @_settings.ServerDescription</MudText>
-        <MudText Typo="Typo.body1">ServerPlayerMaxNum: @_settings.ServerPlayerMaxNum</MudText>
+        @* <MudText Typo="Typo.body1">ServerName: @_activeSettings.ServerName</MudText> *@
+        @* <MudText Typo="Typo.body1">ServerDescription: @_activeSettings.ServerDescription</MudText> *@
+        @* <MudText Typo="Typo.body1">ServerPlayerMaxNum: @_activeSettings.ServerPlayerMaxNum</MudText> *@
+        <MudText Typo="Typo.body1">@_settings</MudText>
 
         <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="EditSettings">Edit</MudButton>
         <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="SaveSettings">Save</MudButton>
@@ -22,12 +23,14 @@
 </MudContainer>
 
 @code {
-    private PalWorldSettings? _settings;
+    private PalWorldSettings? _activeSettings;
+    private string? _settings;
 
     protected override async Task OnInitializedAsync()
     {
         try
         {
+            _activeSettings = await PalService.GetActivePalWorldSettingsAsync();
             _settings = await PalService.GetPalWorldSettingsAsync();
         }
         catch (Exception e)
@@ -35,7 +38,7 @@
             Snackbar.Add(e.Message, Severity.Error);
         }
     }
-    
+
     private async Task EditSettings()
     {
         Snackbar.Add("Not Implemented", Severity.Error);
