@@ -1,6 +1,7 @@
 ﻿@using Web.Services
 @inherits LayoutComponentBase
 @inject ClipboardService ClipboardService
+@inject PalService PalService
 
 <MudThemeProvider Theme="@_theme" IsDarkMode="_isDarkMode"/>
 <MudPopoverProvider/>
@@ -12,6 +13,7 @@
                        OnClick="@((e) => DrawerToggle())"/>
         <MudText Typo="Typo.h5" Class="ml-3">Pal World GM</MudText>
         <MudSpacer/>
+        <MudIconButton Icon="@Icons.Material.Filled.RestartAlt" Color="Color.Error" OnClick="@OpenRestartDialog"/>
         <MudIconButton Icon="@Icons.Material.Filled.AdminPanelSettings" Color="Color.Inherit"
                        OnClick="@CopyAdminCommand"/>
         <MudIconButton Icon="@(DarkLightModeButtonIcon)" Color="Color.Inherit" OnClick="@DarkModeToggle"/>
@@ -62,6 +64,11 @@
     private async Task CopyAdminCommand()
     {
         await ClipboardService.CopyToClipboardAsync("/AdminPassword");
+    }
+
+    private async Task OpenRestartDialog()
+    {
+        // TODO: 确认重启，可选倒计时
     }
 
     private readonly PaletteLight _lightPalette = new()

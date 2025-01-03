@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.Diagnostics;
+using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Microsoft.Extensions.Options;
@@ -12,6 +13,7 @@ public class PalService
     private readonly HttpClient _httpClient;
     private readonly string _host;
     private readonly string _configPath;
+    private readonly string _dockerComposeDirectory;
 
     public PalService(HttpClient httpClient, IOptions<PalServiceOptions> options)
     {
@@ -20,6 +22,7 @@ public class PalService
         var authHeader = BasicAuthHelper.GetBasicAuthHeader(options.Value.Username, options.Value.Password);
         _httpClient.DefaultRequestHeaders.Authorization = authHeader;
         _configPath = Path.Join(options.Value.Root, "Saved/Config/LinuxServer/PalWorldSettings.ini");
+        _dockerComposeDirectory = options.Value.Root;
     }
 
     private string GetUrl(string path) => $"{_host}/{path}";
@@ -139,6 +142,42 @@ public class PalService
     {
         var ini = settings.ToIni();
         await File.WriteAllTextAsync(_configPath, ini);
+    }
+
+    public async Task RestartServer()
+    {
+        // run docker compose down
+        var dockerComposeDown = new Process
+        {
+            StartInfo = new ProcessStartInfo
+            {
+                FileName = "docker-compose",
+                Arguments = "down",
+                WorkingDirectory = _dockerComposeDirectory,
+                RedirectStandardOutput = true,
+                RedirectStandardError = true,
+                UseShellExecute = false,
+                CreateNoWindow = true,
+            }
+        };
+        dockerComposeDown.Start();
+        await dockerComposeDown.WaitForExitAsync();
+
+        // run docker compose up -d
+        var dockerComposeUp = new Process
+        {
+            StartInfo = new ProcessStartInfo
+            {
+                FileName = "docker-compose",
+                Arguments = "up -d",
+                WorkingDirectory = _dockerComposeDirectory,
+                RedirectStandardOutput = true,
+                RedirectStandardError = true,
+                UseShellExecute = false,
+                CreateNoWindow = true,
+            }
+        };
+        dockerComposeUp.Start();
     }
 }
 
