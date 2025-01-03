@@ -3,7 +3,7 @@
 @inject PalService PalService
 
 <PageTitle>Announce</PageTitle>
-<MudContainer>
+<MudContainer MaxWidth="MaxWidth.Medium">
     <MudText Typo="Typo.h3" GutterBottom="true">Announce</MudText>
     <MudTextField @bind-Value="_announcement" Label="Announcement" Variant="Variant.Outlined"/>
     <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="SendAnnouncement">Send</MudButton>

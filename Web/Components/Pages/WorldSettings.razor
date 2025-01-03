@@ -4,7 +4,7 @@
 @inject ISnackbar Snackbar
 
 <PageTitle>World Settings</PageTitle>
-<MudContainer>
+<MudContainer MaxWidth="MaxWidth.Medium">
     <MudText Typo="Typo.h3" GutterBottom="true">World Settings</MudText>
     @if (_settings == null)
     {
@@ -12,18 +12,26 @@
     }
     else
     {
-        <MudText Typo="Typo.body1">ServerName: @_settings.ServerName</MudText>
-        <MudText Typo="Typo.body1">ServerDescription: @_settings.ServerDescription</MudText>
-        <MudText Typo="Typo.body1">ServerPlayerMaxNum: @_settings.ServerPlayerMaxNum</MudText>
-
-        <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="EditSettings">Edit</MudButton>
-        <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="SaveSettings">Save</MudButton>
+        <MudPaper Class="pa-4">
+            <MudForm Model="@_settings" @ref="_form" ValidationDelay="0">
+                <MudTextField @bind-Value="_settings.ServerName"
+                              For="() => _settings.ServerName"
+                              Immediate="true"
+                              Label="Server Name"/>
+            </MudForm>
+        </MudPaper>
+        <MudPaper Class="pa-4 mt-4">
+            <MudButton Variant="Variant.Filled" Color="Color.Primary" DropShadow="false">
+                Save
+            </MudButton>
+        </MudPaper>
     }
 </MudContainer>
 
 @code {
     private PalWorldSettings? _activeSettings;
     private PalWorldSettings? _settings;
+    private MudForm _form;
 
     protected override async Task OnInitializedAsync()
     {

@@ -12,17 +12,20 @@
 }
 else
 {
-    <MudContainer>
-        <MudText Typo="Typo.h3" GutterBottom="true">Server Info</MudText>
-        <MudText Typo="Typo.body1">Name: @_serverInfo?.ServerName</MudText>
-        <MudText Typo="Typo.body1">Description: @_serverInfo?.Description</MudText>
-        <MudText Typo="Typo.body1">Version: @_serverInfo?.Version</MudText>
-        <MudText Typo="Typo.body1">World Guid: @_serverInfo?.WorldGuid</MudText>
-        <MudText Typo="Typo.body1">Player Num: @_serverMetrics?.CurrentPlayerNum/@_serverMetrics?.MaxPlayerNum</MudText>
-        <MudText Typo="Typo.body1">Server FPS: @_serverMetrics?.ServerFps</MudText>
-        <MudText Typo="Typo.body1">Server Frame Time: @_serverMetrics?.ServerFrameTime</MudText>
-        <MudText Typo="Typo.body1">Days: @_serverMetrics?.Days</MudText>
-        <MudText Typo="Typo.body1">Up Time: @FormatUptime(_serverMetrics?.Uptime)</MudText>
+    <MudContainer MaxWidth="MaxWidth.Medium">
+        <MudPaper Class="pa-4">
+            <MudText Typo="Typo.h3" GutterBottom="true">Server Info</MudText>
+            <MudText Typo="Typo.body1">Name: @_serverInfo?.ServerName</MudText>
+            <MudText Typo="Typo.body1">Description: @_serverInfo?.Description</MudText>
+            <MudText Typo="Typo.body1">Version: @_serverInfo?.Version</MudText>
+            <MudText Typo="Typo.body1">World Guid: @_serverInfo?.WorldGuid</MudText>
+            <MudText Typo="Typo.body1">Player
+                Num: @_serverMetrics?.CurrentPlayerNum/@_serverMetrics?.MaxPlayerNum</MudText>
+            <MudText Typo="Typo.body1">Server FPS: @_serverMetrics?.ServerFps</MudText>
+            <MudText Typo="Typo.body1">Server Frame Time: @_serverMetrics?.ServerFrameTime</MudText>
+            <MudText Typo="Typo.body1">Days: @_serverMetrics?.Days</MudText>
+            <MudText Typo="Typo.body1">Up Time: @FormatUptime(_serverMetrics?.Uptime)</MudText>
+        </MudPaper>
     </MudContainer>
 }
 
