@@ -1,58 +1,47 @@
 ﻿@page "/"
 @using Web.Services
 
+@implements IDisposable
+
 @inject PalService PalService
-@inject ISnackbar Snackbar
 
 <PageTitle>Home</PageTitle>
-
-@if (_serverInfo == null)
-{
-    <MudProgressCircular Color="Color.Default" Indeterminate="true"/>
-}
-else
-{
-    <MudContainer MaxWidth="MaxWidth.Medium">
-        <MudPaper Class="pa-4">
-            <MudText Typo="Typo.h3" GutterBottom="true">Server Info</MudText>
-            <MudText Typo="Typo.body1">Name: @_serverInfo?.ServerName</MudText>
-            <MudText Typo="Typo.body1">Description: @_serverInfo?.Description</MudText>
-            <MudText Typo="Typo.body1">Version: @_serverInfo?.Version</MudText>
-            <MudText Typo="Typo.body1">World Guid: @_serverInfo?.WorldGuid</MudText>
-            <MudText Typo="Typo.body1">Player
-                Num: @_serverMetrics?.CurrentPlayerNum/@_serverMetrics?.MaxPlayerNum</MudText>
-            <MudText Typo="Typo.body1">Server FPS: @_serverMetrics?.ServerFps</MudText>
-            <MudText Typo="Typo.body1">Server Frame Time: @_serverMetrics?.ServerFrameTime</MudText>
-            <MudText Typo="Typo.body1">Days: @_serverMetrics?.Days</MudText>
-            <MudText Typo="Typo.body1">Up Time: @FormatUptime(_serverMetrics?.Uptime)</MudText>
-        </MudPaper>
-    </MudContainer>
-}
+<MudContainer MaxWidth="MaxWidth.Medium">
+    <MudPaper Class="pa-4">
+        <MudText Typo="Typo.h3" GutterBottom="true">Server Info</MudText>
+        <MudText Typo="Typo.body1">Name: @PalService.PalServerInfo.ServerName</MudText>
+        <MudText Typo="Typo.body1">Description: @PalService.PalServerInfo.Description</MudText>
+        <MudText Typo="Typo.body1">Version: @PalService.PalServerInfo.Version</MudText>
+        <MudText Typo="Typo.body1">World Guid: @PalService.PalServerInfo.WorldGuid</MudText>
+        <MudText Typo="Typo.body1">Player
+            Num: @PalService.PalServerMetrics.CurrentPlayerNum/@PalService.PalServerMetrics.MaxPlayerNum</MudText>
+        <MudText Typo="Typo.body1">Server FPS: @PalService.PalServerMetrics.ServerFps</MudText>
+        <MudText Typo="Typo.body1">Server Frame Time: @PalService.PalServerMetrics.ServerFrameTime</MudText>
+        <MudText Typo="Typo.body1">Days: @PalService.PalServerMetrics.Days</MudText>
+        <MudText Typo="Typo.body1">Up Time: @FormatUptime(PalService.PalServerMetrics.Uptime)</MudText>
+    </MudPaper>
+</MudContainer>
 
 @code
 {
-    private PalServerInfo? _serverInfo;
-    private PalServerMetrics? _serverMetrics;
 
-    protected override async Task OnInitializedAsync()
+    private Action? _onChangeHandler;
+
+    protected override void OnInitialized()
     {
-        try
+        _onChangeHandler = async void () =>
         {
-            _serverInfo = await PalService.GetServerInfoAsync();
-        }
-        catch (Exception e)
-        {
-            Snackbar.Add(e.Message, Severity.Error);
-        }
-
-        try
-        {
-            _serverMetrics = await PalService.GetServerMetricsAsync();
-        }
-        catch (Exception e)
-        {
-            Snackbar.Add(e.Message, Severity.Error);
-        }
+            try
+            {
+                await InvokeAsync(StateHasChanged);
+            }
+            catch (Exception e)
+            {
+                // do nothing
+            }
+        };
+        PalService.OnChangeServerInfo += _onChangeHandler;
+        base.OnInitialized();
     }
 
     private static string FormatUptime(double? uptimeSeconds)
@@ -65,5 +54,13 @@ else
         var uptime = TimeSpan.FromSeconds(uptimeSeconds.Value);
 
         return $"{uptime.Days}d {uptime.Hours}h {uptime.Minutes}m {uptime.Seconds}s";
+    }
+
+    public void Dispose()
+    {
+        if (_onChangeHandler != null)
+        {
+            PalService.OnChangeServerInfo -= _onChangeHandler;
+        }
     }
 }

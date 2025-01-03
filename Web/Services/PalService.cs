@@ -8,37 +8,138 @@ using Web.Utilities;
 
 namespace Web.Services;
 
-public class PalService
+public class PalService : IDisposable
 {
     private readonly HttpClient _httpClient;
     private readonly string _host;
     private readonly string _configPath;
     private readonly string _dockerComposeDirectory;
+    private readonly CancellationTokenSource _cancellationTokenSource = new();
+    private readonly ILogger<PalService> _logger;
 
-    public PalService(HttpClient httpClient, IOptions<PalServiceOptions> options)
+    public PalServerInfo PalServerInfo { get; private set; } = new();
+    public PalServerMetrics PalServerMetrics { get; private set; } = new();
+    public List<PlayerInfo> Players { get; private set; } = [];
+
+    private int _onChangeServerInfoSubscriberCount = 0;
+    private Action? _onChangeServerInfo;
+
+    public event Action? OnChangeServerInfo
     {
+        add
+        {
+            _onChangeServerInfoSubscriberCount++;
+            _onChangeServerInfo += value;
+        }
+        remove
+        {
+            _onChangeServerInfoSubscriberCount--;
+            _onChangeServerInfo -= value;
+        }
+    }
+
+    private int _onChangePlayersSubscriberCount = 0;
+    private Action? _onChangePlayers;
+
+    public event Action? OnChangePlayers
+    {
+        add
+        {
+            _onChangePlayersSubscriberCount++;
+            _onChangePlayers += value;
+        }
+        remove
+        {
+            _onChangePlayersSubscriberCount--;
+            _onChangePlayers -= value;
+        }
+    }
+
+    private void NotifyServerInfoChanged() => _onChangeServerInfo?.Invoke();
+    private void NotifyPlayersChanged() => _onChangePlayers?.Invoke();
+
+    public PalService(HttpClient httpClient, IOptions<PalServiceOptions> options, ILogger<PalService> logger)
+    {
+        Console.WriteLine("PalService created");
         _httpClient = httpClient;
         _host = options.Value.Url;
         var authHeader = BasicAuthHelper.GetBasicAuthHeader(options.Value.Username, options.Value.Password);
         _httpClient.DefaultRequestHeaders.Authorization = authHeader;
         _configPath = Path.Join(options.Value.Root, "Saved/Config/LinuxServer/PalWorldSettings.ini");
         _dockerComposeDirectory = options.Value.Root;
+        _logger = logger;
+
+        Task.Run(() => RefreshAsync(_cancellationTokenSource.Token));
+    }
+
+    public void Dispose()
+    {
+        _cancellationTokenSource.Cancel();
+        _cancellationTokenSource.Dispose();
+        GC.SuppressFinalize(this);
     }
 
     private string GetUrl(string path) => $"{_host}/{path}";
 
+    private async Task RefreshAsync(CancellationToken cancellationToken)
+    {
+        while (!cancellationToken.IsCancellationRequested)
+        {
+            if (_onChangeServerInfoSubscriberCount > 0)
+            {
+                try
+                {
+                    var newPalServerInfo = await GetServerInfoAsync();
+                    var newPalServerMetrics = await GetServerMetricsAsync();
+                    if (PalServerInfo != newPalServerInfo || PalServerMetrics != newPalServerMetrics)
+                    {
+                        PalServerInfo = newPalServerInfo;
+                        PalServerMetrics = newPalServerMetrics;
+                        NotifyServerInfoChanged();
+                    }
 
-    public async Task<PalServerInfo> GetServerInfoAsync()
+                    _logger.LogInformation("Server info and metrics updated");
+                }
+                catch (Exception e)
+                {
+                    _logger.LogError(e, "Failed to get server info or metrics");
+                }
+            }
+
+            if (_onChangePlayersSubscriberCount > 0)
+            {
+                try
+                {
+                    var newPlayers = await GetPlayersAsync();
+                    if (!Players.SequenceEqual(newPlayers))
+                    {
+                        Players = newPlayers;
+                        NotifyPlayersChanged();
+                    }
+
+                    _logger.LogInformation("Players updated");
+                }
+                catch (Exception e)
+                {
+                    _logger.LogError(e, "Failed to get players");
+                }
+            }
+
+            await Task.Delay(1000, cancellationToken);
+        }
+    }
+
+    private async Task<PalServerInfo> GetServerInfoAsync()
     {
         return (await _httpClient.GetFromJsonAsync<PalServerInfo>(GetUrl("v1/api/info")))!;
     }
 
-    public async Task<PalServerMetrics> GetServerMetricsAsync()
+    private async Task<PalServerMetrics> GetServerMetricsAsync()
     {
         return (await _httpClient.GetFromJsonAsync<PalServerMetrics>(GetUrl("v1/api/metrics")))!;
     }
 
-    public async Task<List<PlayerInfo>> GetPlayersAsync()
+    private async Task<List<PlayerInfo>> GetPlayersAsync()
     {
         return (await _httpClient.GetFromJsonAsync<PlayerList>(GetUrl("v1/api/players")))!.Players;
     }

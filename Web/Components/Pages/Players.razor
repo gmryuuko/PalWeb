@@ -1,6 +1,8 @@
 @page "/players"
 @using Web.Services
 
+@implements IDisposable
+
 @inject PalService PalService
 @inject ClipboardService ClipboardService
 @inject ISnackbar Snackbar
@@ -9,35 +11,35 @@
 
 <MudContainer>
     <MudText Typo="Typo.h3" GutterBottom="true">Players</MudText>
-    <MudTable Items="_rows" Hover="true" SortLabel="Sort By">
+    <MudTable Items="PalService.Players" Hover="true" SortLabel="Sort By">
         <HeaderContent>
             <MudTh>
-                <MudTableSortLabel SortBy="new Func<PlayerRow, object>(x => x.Info.Name)">Name</MudTableSortLabel>
+                <MudTableSortLabel SortBy="new Func<PlayerInfo, object>(x => x.Name)">Name</MudTableSortLabel>
             </MudTh>
             <MudTh>
-                <MudTableSortLabel SortBy="new Func<PlayerRow, object>(x => x.Info.AccountName)">AccountName
+                <MudTableSortLabel SortBy="new Func<PlayerInfo, object>(x => x.AccountName)">AccountName
                 </MudTableSortLabel>
             </MudTh>
             <MudTh>
-                <MudTableSortLabel SortBy="new Func<PlayerRow, object>(x => x.Info.PlayerId)">PlayerId
+                <MudTableSortLabel SortBy="new Func<PlayerInfo, object>(x => x.PlayerId)">PlayerId
                 </MudTableSortLabel>
             </MudTh>
             <MudTh>
-                <MudTableSortLabel SortBy="new Func<PlayerRow, object>(x => x.Info.UserId)">UserId</MudTableSortLabel>
+                <MudTableSortLabel SortBy="new Func<PlayerInfo, object>(x => x.UserId)">UserId</MudTableSortLabel>
             </MudTh>
             <MudTh>
-                <MudTableSortLabel SortBy="new Func<PlayerRow, object>(x => x.Info.Level)">Level</MudTableSortLabel>
+                <MudTableSortLabel SortBy="new Func<PlayerInfo, object>(x => x.Level)">Level</MudTableSortLabel>
             </MudTh>
             <MudTh></MudTh>
             <MudTh></MudTh>
             <MudTh></MudTh>
         </HeaderContent>
         <RowTemplate>
-            <MudTd>@context.Info.Name</MudTd>
-            <MudTd>@context.Info.AccountName</MudTd>
-            <MudTd>@context.Info.PlayerId</MudTd>
-            <MudTd>@context.Info.UserId</MudTd>
-            <MudTd>@context.Info.Level</MudTd>
+            <MudTd>@context.Name</MudTd>
+            <MudTd>@context.AccountName</MudTd>
+            <MudTd>@context.PlayerId</MudTd>
+            <MudTd>@context.UserId</MudTd>
+            <MudTd>@context.Level</MudTd>
             <MudTd>
                 <MudButton Size="Size.Small" Color="Color.Primary" Variant="Variant.Filled"
                            OnClick="() => CopyTpTo(context)">
@@ -62,33 +64,31 @@
 
 @code {
 
-    private class PlayerRow
+    private Action? _onChangeHandler;
+
+    protected override void OnInitialized()
     {
-        public PlayerInfo Info { get; set; } = null!;
+        _onChangeHandler = async void () =>
+        {
+            try
+            {
+                await InvokeAsync(StateHasChanged);
+            }
+            catch (Exception e)
+            {
+                // do nothing
+            }
+        };
+        PalService.OnChangePlayers += _onChangeHandler;
+        base.OnInitialized();
     }
 
-    private List<PlayerRow> _rows = [];
-
-    protected override async Task OnInitializedAsync()
+    private async Task KickPlayer(PlayerInfo context)
     {
         try
         {
-            var players = await PalService.GetPlayersAsync();
-            _rows = players.Select(x => new PlayerRow { Info = x }).ToList();
-        }
-        catch (Exception e)
-        {
-            Snackbar.Add(e.Message, Severity.Error);
-        }
-    }
-
-    private async Task KickPlayer(PlayerRow context)
-    {
-        try
-        {
-            await PalService.KickPlayerAsync(context.Info.UserId);
+            await PalService.KickPlayerAsync(context.UserId);
             Snackbar.Add("Player kicked", Severity.Success);
-            _rows.Remove(context);
         }
         catch (Exception e)
         {
@@ -96,13 +96,12 @@
         }
     }
 
-    private async Task BanPlayer(PlayerRow context)
+    private async Task BanPlayer(PlayerInfo context)
     {
         try
         {
-            await PalService.BanPlayerAsync(context.Info.UserId);
+            await PalService.BanPlayerAsync(context.UserId);
             Snackbar.Add("Player kicked", Severity.Success);
-            _rows.Remove(context);
         }
         catch (Exception e)
         {
@@ -110,14 +109,22 @@
         }
     }
 
-    private async Task CopyTpTo(PlayerRow context)
+    private async Task CopyTpTo(PlayerInfo context)
     {
-        await ClipboardService.CopyToClipboardAsync($"/TeleportToPlayer {context.Info.UserId}");
+        await ClipboardService.CopyToClipboardAsync($"/TeleportToPlayer {context.UserId}");
     }
 
-    private async Task CopyTpToMe(PlayerRow context)
+    private async Task CopyTpToMe(PlayerInfo context)
     {
-        await ClipboardService.CopyToClipboardAsync($"/TeleportToMe  {context.Info.UserId}");
+        await ClipboardService.CopyToClipboardAsync($"/TeleportToMe  {context.UserId}");
+    }
+
+    public void Dispose()
+    {
+        if (_onChangeHandler != null)
+        {
+            PalService.OnChangePlayers -= _onChangeHandler;
+        }
     }
 
 }

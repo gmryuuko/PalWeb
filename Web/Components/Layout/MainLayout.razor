@@ -1,7 +1,6 @@
 ﻿@using Web.Services
 @inherits LayoutComponentBase
 @inject ClipboardService ClipboardService
-@inject PalService PalService
 
 <MudThemeProvider Theme="@_theme" IsDarkMode="_isDarkMode"/>
 <MudPopoverProvider/>
@@ -21,6 +20,9 @@
     <MudDrawer @bind-Open="_drawerOpen" ClipMode="DrawerClipMode.Always" Elevation="2">
         <NavMenu/>
     </MudDrawer>
+    <MudOverlay @bind-Visible="_restartOverlay" DarkBackground>
+        <MudText Typo="Typo.h1">Overlay</MudText>
+    </MudOverlay>
     <MudMainContent Class="mt-16 pa-4">
         @Body
     </MudMainContent>
@@ -37,6 +39,9 @@
     private bool _drawerOpen = true;
     private bool _isDarkMode = true;
     private MudTheme? _theme = null;
+
+    private bool _restartOverlay = false;
+
 
     protected override void OnInitialized()
     {
@@ -66,9 +71,9 @@
         await ClipboardService.CopyToClipboardAsync("/AdminPassword");
     }
 
-    private async Task OpenRestartDialog()
+    private void OpenRestartDialog()
     {
-        // TODO: 确认重启，可选倒计时
+        _restartOverlay = !_restartOverlay;
     }
 
     private readonly PaletteLight _lightPalette = new()

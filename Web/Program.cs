@@ -9,10 +9,12 @@ builder.Configuration.AddJsonFile("appsettings.Secrets.json", optional: true, re
 builder.Services.Configure<PalServiceOptions>(builder.Configuration.GetSection("PalService"));
 
 builder.Services.AddHttpClient<PalService>();
+builder.Services.AddSingleton<PalService>();
 builder.Services.AddScoped<ClipboardService>();
 
 // Add MudBlazor services
 builder.Services.AddMudServices();
+
 
 // Add services to the container.
 builder.Services.AddRazorComponents()
