@@ -13,15 +13,233 @@
     else
     {
         <MudPaper Class="pa-4">
+            <MudGrid>
+                <MudItem xs="8">
+                    <MudText Typo="Typo.h4">设置</MudText>
+                </MudItem>
+                <MudItem xs="4">
+                    <MudText Typo="Typo.h4"
+                             Color="@(_settings != null && _activeSettings != null && _settings.AreSettingsEqualExceptPassword(_activeSettings) ? Color.Inherit : Color.Error)">
+                        当前生效值
+                    </MudText>
+                </MudItem>
+            </MudGrid>
             <MudForm Model="@_settings" @ref="_form" ValidationDelay="0">
-                <MudTextField @bind-Value="_settings.ServerName"
-                              For="() => _settings.ServerName"
-                              Immediate="true"
-                              Label="Server Name"/>
+                <MudText Typo="Typo.h6" Class="mt-6 mb-4">基本</MudText>
+                <PalWorldSettingInput
+                    @bind-Value="_settings.ServerName"
+                    ActiveValue="_activeSettings?.ServerName"
+                    Label="服务器名称"/>
+                <PalWorldSettingInput
+                    @bind-Value="_settings.ServerDescription"
+                    ActiveValue="_activeSettings?.ServerDescription"
+                    Label="服务器描述"/>
+                <PalWorldSettingInput
+                    @bind-Value="_settings.ServerPlayerMaxNum"
+                    ActiveValue="_activeSettings?.ServerPlayerMaxNum"
+                    Label="服务器最大玩家数量"/>
+                <PalWorldSettingInput
+                    @bind-Value="_settings.PublicPort"
+                    ActiveValue="_activeSettings?.PublicPort"
+                    Label="公共端口"/>
+                <PalWorldSettingInput
+                    @bind-Value="_settings.PublicIP"
+                    ActiveValue="_activeSettings?.PublicIP"
+                    Label="公共IP"/>
+                <PalWorldSettingInput
+                    @bind-Value="_settings.ChatPostLimitPerMinute"
+                    ActiveValue="_activeSettings?.ChatPostLimitPerMinute"
+                    Label="每分钟聊天发布限制"/>
+                <PalWorldSettingCheckBox
+                    @bind-Value="_settings.bShowPlayerList"
+                    ActiveValue="_activeSettings?.bShowPlayerList"
+                    Label="显示玩家列表"/>
+
+                <MudText Typo="Typo.h6" Class="mt-6 mb-4">世界</MudText>
+                <PalWorldSettingInput
+                    @bind-Value="_settings.DayTimeSpeedRate"
+                    ActiveValue="_activeSettings?.DayTimeSpeedRate"
+                    Label="白天时间速度倍率"/>
+                <PalWorldSettingInput
+                    @bind-Value="_settings.NightTimeSpeedRate"
+                    ActiveValue="_activeSettings?.NightTimeSpeedRate"
+                    Label="夜晚时间速度倍率"/>
+                <PalWorldSettingInput
+                    @bind-Value="_settings.ExpRate"
+                    ActiveValue="_activeSettings?.ExpRate"
+                    Label="经验倍率"/>
+                <PalWorldSettingInput
+                    @bind-Value="_settings.EnemyDropItemRate"
+                    ActiveValue="_activeSettings?.EnemyDropItemRate"
+                    Label="敌人掉落物品倍率"/>
+                <PalWorldSettingInput
+                    @bind-Value="_settings.DropItemMaxNum"
+                    ActiveValue="_activeSettings?.DropItemMaxNum"
+                    Label="掉落物品最大数量"/>
+                <PalWorldSettingInput
+                    @bind-Value="_settings.BaseCampMaxNum"
+                    ActiveValue="_activeSettings?.BaseCampMaxNum"
+                    Label="基地最大数量"/>
+                <PalWorldSettingInput
+                    @bind-Value="_settings.BaseCampWorkerMaxNum"
+                    ActiveValue="_activeSettings?.BaseCampWorkerMaxNum"
+                    Label="基地工人最大数量"/>
+                <PalWorldSettingInput
+                    @bind-Value="_settings.DropItemAliveMaxHours"
+                    ActiveValue="_activeSettings?.DropItemAliveMaxHours"
+                    Label="掉落物品存活最大时间（小时）"/>
+                <PalWorldSettingInput
+                    @bind-Value="_settings.SupplyDropSpan"
+                    ActiveValue="_activeSettings?.SupplyDropSpan"
+                    Label="补给掉落间隔（分钟）"/>
+                <PalWorldSettingInput
+                    @bind-Value="_settings.ItemWeightRate"
+                    ActiveValue="_activeSettings?.ItemWeightRate"
+                    Label="物品重量倍率"/>
+                <PalWorldSettingCheckBox
+                    @bind-Value="_settings.bEnableInvaderEnemy"
+                    ActiveValue="_activeSettings?.bEnableInvaderEnemy"
+                    Label="启用入侵敌人"/>
+
+                <MudText Typo="Typo.h6" Class="mt-6 mb-4">采集物</MudText>
+                <PalWorldSettingInput
+                    @bind-Value="_settings.CollectionDropRate"
+                    ActiveValue="_activeSettings?.CollectionDropRate"
+                    Label="采集掉落倍率"/>
+                <PalWorldSettingInput
+                    @bind-Value="_settings.CollectionObjectHpRate"
+                    ActiveValue="_activeSettings?.CollectionObjectHpRate"
+                    Label="采集物体力倍率"/>
+                <PalWorldSettingInput
+                    @bind-Value="_settings.CollectionObjectRespawnSpeedRate"
+                    ActiveValue="_activeSettings?.CollectionObjectRespawnSpeedRate"
+                    Label="采集物重生速度倍率"/>
+
+
+                <MudText Typo="Typo.h6" Class="mt-6 mb-4">帕鲁</MudText>
+                <PalWorldSettingInput
+                    @bind-Value="_settings.PalCaptureRate"
+                    ActiveValue="_activeSettings?.PalCaptureRate"
+                    Label="帕鲁捕捉成功倍率"/>
+                <PalWorldSettingInput
+                    @bind-Value="_settings.PalSpawnNumRate"
+                    ActiveValue="_activeSettings?.PalSpawnNumRate"
+                    Label="帕鲁生成倍率"/>
+                <PalWorldSettingInput
+                    @bind-Value="_settings.PalDamageRateAttack"
+                    ActiveValue="_activeSettings?.PalDamageRateAttack"
+                    Label="帕鲁攻击伤害倍率"/>
+                <PalWorldSettingInput
+                    @bind-Value="_settings.PalDamageRateDefense"
+                    ActiveValue="_activeSettings?.PalDamageRateDefense"
+                    Label="帕鲁防御伤害倍率"/>
+                <PalWorldSettingInput
+                    @bind-Value="_settings.PalStomachDecreaceRate"
+                    ActiveValue="_activeSettings?.PalStomachDecreaceRate"
+                    Label="帕鲁饥饿值减少倍率"/>
+                <PalWorldSettingInput
+                    @bind-Value="_settings.PalStaminaDecreaceRate"
+                    ActiveValue="_activeSettings?.PalStaminaDecreaceRate"
+                    Label="帕鲁体力值减少倍率"/>
+                <PalWorldSettingInput
+                    @bind-Value="_settings.PalAutoHPRegeneRate"
+                    ActiveValue="_activeSettings?.PalAutoHPRegeneRate"
+                    Label="帕鲁自动回血倍率"/>
+                <PalWorldSettingInput
+                    @bind-Value="_settings.PalAutoHpRegeneRateInSleep"
+                    ActiveValue="_activeSettings?.PalAutoHpRegeneRateInSleep"
+                    Label="帕鲁睡眠时自动回血倍率"/>
+                <PalWorldSettingInput
+                    @bind-Value="_settings.PalEggDefaultHatchingTime"
+                    ActiveValue="_activeSettings?.PalEggDefaultHatchingTime"
+                    Label="帕鲁蛋默认孵化时间（小时）"/>
+
+                <MudText Typo="Typo.h6" Class="mt-6 mb-4">玩家</MudText>
+                <PalWorldSettingInput
+                    @bind-Value="_settings.PlayerDamageRateAttack"
+                    ActiveValue="_activeSettings?.PlayerDamageRateAttack"
+                    Label="玩家攻击伤害倍率"/>
+                <PalWorldSettingInput
+                    @bind-Value="_settings.PlayerDamageRateDefense"
+                    ActiveValue="_activeSettings?.PlayerDamageRateDefense"
+                    Label="玩家防御伤害倍率"/>
+                <PalWorldSettingInput
+                    @bind-Value="_settings.PlayerStomachDecreaceRate"
+                    ActiveValue="_activeSettings?.PlayerStomachDecreaceRate"
+                    Label="玩家饥饿值减少倍率"/>
+                <PalWorldSettingInput
+                    @bind-Value="_settings.PlayerStaminaDecreaceRate"
+                    ActiveValue="_activeSettings?.PlayerStaminaDecreaceRate"
+                    Label="玩家体力值减少倍率"/>
+                <PalWorldSettingInput
+                    @bind-Value="_settings.PlayerAutoHPRegeneRate"
+                    ActiveValue="_activeSettings?.PlayerAutoHPRegeneRate"
+                    Label="玩家自动回血倍率"/>
+                <PalWorldSettingInput
+                    @bind-Value="_settings.PlayerAutoHpRegeneRateInSleep"
+                    ActiveValue="_activeSettings?.PlayerAutoHpRegeneRateInSleep"
+                    Label="玩家睡眠时自动回血倍率"/>
+
+
+                <MudText Typo="Typo.h6" Class="mt-6 mb-4">建筑</MudText>
+                <PalWorldSettingInput
+                    @bind-Value="_settings.BuildObjectHpRate"
+                    ActiveValue="_activeSettings?.BuildObjectHpRate"
+                    Label="建筑物体力倍率"/>
+                <PalWorldSettingInput
+                    @bind-Value="_settings.BuildObjectDamageRate"
+                    ActiveValue="_activeSettings?.BuildObjectDamageRate"
+                    Label="建筑物伤害倍率"/>
+                <PalWorldSettingInput
+                    @bind-Value="_settings.BuildObjectDeteriorationDamageRate"
+                    ActiveValue="_activeSettings?.BuildObjectDeteriorationDamageRate"
+                    Label="建筑物老化伤害倍率"/>
+                <PalWorldSettingInput
+                    @bind-Value="_settings.MaxBuildingLimitNum"
+                    ActiveValue="_activeSettings?.MaxBuildingLimitNum"
+                    Label="最大建筑限制数量（0 为无限制）"/>
+
+                <MudText Typo="Typo.h6" Class="mt-6 mb-4">工会</MudText>
+                <PalWorldSettingInput
+                    @bind-Value="_settings.GuildPlayerMaxNum"
+                    ActiveValue="_activeSettings?.GuildPlayerMaxNum"
+                    Label="工会最大玩家数量"/>
+                <PalWorldSettingInput
+                    @bind-Value="_settings.BaseCampMaxNumInGuild"
+                    ActiveValue="_activeSettings?.BaseCampMaxNumInGuild"
+                    Label="工会内基地最大数量"/>
+                <PalWorldSettingCheckBox
+                    @bind-Value="_settings.bInvisibleOtherGuildBaseCampAreaFX"
+                    ActiveValue="_activeSettings?.bInvisibleOtherGuildBaseCampAreaFX"
+                    Label="隐藏其他工会基地区域效果"/>
+
+                <MudText Typo="Typo.h6" Class="mt-6 mb-4">难度</MudText>
+                <PalWorldSettingOption
+                    @bind-Value="_settings.DeathPenalty"
+                    ActiveValue="@_activeSettings?.DeathPenalty"
+                    Label="死亡惩罚"
+                    Options="PalWorldSettings.DeathPenaltyOptions"/>
+                <PalWorldSettingCheckBox
+                    @bind-Value="_settings.bPalLost"
+                    ActiveValue="_activeSettings?.bPalLost"
+                    Label="帕鲁死亡永久丢失"/>
+                <PalWorldSettingCheckBox
+                    @bind-Value="_settings.bEnableFastTravel"
+                    ActiveValue="_activeSettings?.bEnableFastTravel"
+                    Label="启用快速旅行"/>
+
+                @* <MudText Typo="Typo.h6" Class="mt-6 mb-4">密码</MudText> *@
+                @* <PalWorldSettingInput *@
+                @*     @bind-Value="_settings.ServerPassword" *@
+                @*     ActiveValue="_activeSettings?.ServerPassword" *@
+                @*     Label="服务器密码"/> *@
+                @* <PalWorldSettingInput *@
+                @*     @bind-Value="_settings.AdminPassword" *@
+                @*     ActiveValue="_activeSettings?.AdminPassword" *@
+                @*     Label="管理员密码"/> *@
             </MudForm>
-        </MudPaper>
-        <MudPaper Class="pa-4 mt-4">
-            <MudButton Variant="Variant.Filled" Color="Color.Primary" DropShadow="false">
+
+            <MudButton Variant="Variant.Filled" Color="Color.Primary" DropShadow="false" Class="mt-6">
                 Save
             </MudButton>
         </MudPaper>

@@ -1,0 +1,34 @@
+﻿<MudGrid Class="mb-2">
+    <MudItem xs="8">
+        <MudSelect Label="@Label" Value="@Value" ValueChanged="@ValueChanged">
+            @foreach (var option in Options)
+            {
+                <MudSelectItem Value="@option">@option</MudSelectItem>
+            }
+        </MudSelect>
+    </MudItem>
+    <MudItem xs="4">
+        <MudText Class="mt-5" Color="ActiveValueColor">@ActiveValue</MudText>
+    </MudItem>
+</MudGrid>
+
+@code {
+
+    [Parameter]
+    public required string Label { get; set; }
+
+    [Parameter]
+    public required string Value { get; set; }
+
+    [Parameter]
+    public required string[] Options { get; set; }
+
+    [Parameter]
+    public EventCallback<string> ValueChanged { get; set; }
+
+    [Parameter]
+    public string? ActiveValue { get; set; }
+
+    private Color ActiveValueColor => Value == ActiveValue ? Color.Primary : Color.Error;
+
+}

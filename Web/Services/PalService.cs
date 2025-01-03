@@ -228,71 +228,134 @@ public class AnnounceRequest
 
 public class PalWorldSettings
 {
-    public string Difficulty { get; set; } = "None";
-    public string RandomizerType { get; set; } = "None";
-    public string RandomizerSeed { get; set; } = "";
+    #region 基本
+
+    public string ServerName { get; set; } = "Default Palworld Server";
+    public string ServerDescription { get; set; } = "";
+    public int ServerPlayerMaxNum { get; set; } = 32;
+    public int PublicPort { get; set; } = 8211;
+    public string PublicIP { get; set; } = "";
+    public int ChatPostLimitPerMinute { get; set; } = 10;
+    public bool bShowPlayerList { get; set; } = false;
+
+    #endregion
+
+    #region 世界
+
     public double DayTimeSpeedRate { get; set; } = 1;
     public double NightTimeSpeedRate { get; set; } = 1;
     public double ExpRate { get; set; } = 1;
+
+    public double EnemyDropItemRate { get; set; } = 1;
+    public int DropItemMaxNum { get; set; } = 3000;
+    public int BaseCampMaxNum { get; set; } = 128;
+    public int BaseCampWorkerMaxNum { get; set; } = 15;
+    public double DropItemAliveMaxHours { get; set; } = 1;
+    public int SupplyDropSpan { get; set; } = 180;
+    public double ItemWeightRate { get; set; } = 1;
+    public bool bEnableInvaderEnemy { get; set; } = true;
+
+    #endregion
+
+    #region 采集物
+
+    public double CollectionDropRate { get; set; } = 1;
+    public double CollectionObjectHpRate { get; set; } = 1;
+    public double CollectionObjectRespawnSpeedRate { get; set; } = 1;
+
+    #endregion
+
+    #region 帕鲁
+
     public double PalCaptureRate { get; set; } = 1;
     public double PalSpawnNumRate { get; set; } = 1;
     public double PalDamageRateAttack { get; set; } = 1;
     public double PalDamageRateDefense { get; set; } = 1;
+    public double PalStomachDecreaceRate { get; set; } = 1;
+    public double PalStaminaDecreaceRate { get; set; } = 1;
+    public double PalAutoHPRegeneRate { get; set; } = 1;
+    public double PalAutoHpRegeneRateInSleep { get; set; } = 1;
+    public double PalEggDefaultHatchingTime { get; set; } = 72;
+
+    #endregion
+
+    #region 玩家
+
     public double PlayerDamageRateAttack { get; set; } = 1;
     public double PlayerDamageRateDefense { get; set; } = 1;
     public double PlayerStomachDecreaceRate { get; set; } = 1;
     public double PlayerStaminaDecreaceRate { get; set; } = 1;
     public double PlayerAutoHPRegeneRate { get; set; } = 1;
     public double PlayerAutoHpRegeneRateInSleep { get; set; } = 1;
-    public double PalStomachDecreaceRate { get; set; } = 1;
-    public double PalStaminaDecreaceRate { get; set; } = 1;
-    public double PalAutoHPRegeneRate { get; set; } = 1;
-    public double PalAutoHpRegeneRateInSleep { get; set; } = 1;
+
+    #endregion
+
+    #region 建筑
+
     public double BuildObjectHpRate { get; set; } = 1;
     public double BuildObjectDamageRate { get; set; } = 1;
     public double BuildObjectDeteriorationDamageRate { get; set; } = 1;
-    public double CollectionDropRate { get; set; } = 1;
-    public double CollectionObjectHpRate { get; set; } = 1;
-    public double CollectionObjectRespawnSpeedRate { get; set; } = 1;
-    public double EnemyDropItemRate { get; set; } = 1;
-    public string DeathPenalty { get; set; } = "All";
-    public bool bEnablePlayerToPlayerDamage { get; set; } = false;
-    public bool bEnableFriendlyFire { get; set; } = false;
-    public bool bEnableInvaderEnemy { get; set; } = true;
-    public bool bActiveUNKO { get; set; } = false;
-    public bool bEnableAimAssistPad { get; set; } = true;
-    public bool bEnableAimAssistKeyboard { get; set; } = false;
-    public int DropItemMaxNum { get; set; } = 3000;
-    public int DropItemMaxNum_UNKO { get; set; } = 100;
-    public int BaseCampMaxNum { get; set; } = 128;
-    public int BaseCampWorkerMaxNum { get; set; } = 15;
-    public double DropItemAliveMaxHours { get; set; } = 1;
-    public bool bAutoResetGuildNoOnlinePlayers { get; set; } = false;
-    public double AutoResetGuildTimeNoOnlinePlayers { get; set; } = 72;
+    public int MaxBuildingLimitNum { get; set; } = 0;
+
+    #endregion
+
+    #region 工会
+
     public int GuildPlayerMaxNum { get; set; } = 20;
     public int BaseCampMaxNumInGuild { get; set; } = 4;
-    public double PalEggDefaultHatchingTime { get; set; } = 72;
+    public bool bInvisibleOtherGuildBaseCampAreaFX { get; set; } = false;
+
+    #endregion
+
+    #region 难度
+
+    public string DeathPenalty { get; set; } = "All";
+
+    public static readonly string[] DeathPenaltyOptions =
+    [
+        "None",
+        "Item",
+        "ItemAndEquipment",
+        "All"
+    ];
+
+    public bool bPalLost { get; set; } = false;
+    public bool bEnableFastTravel { get; set; } = true;
+
+    #endregion
+
+    #region 密码
+
+    public string ServerPassword { get; set; } = "";
+    public string AdminPassword { get; set; } = "";
+
+    #endregion
+
+    #region 没用
+
+    public string Difficulty { get; set; } = "None";
+    public string RandomizerType { get; set; } = "None";
+    public string RandomizerSeed { get; set; } = "";
+    public int DropItemMaxNum_UNKO { get; set; } = 100;
+    public bool bActiveUNKO { get; set; } = false;
+    public bool bEnablePlayerToPlayerDamage { get; set; } = false;
+    public bool bEnableFriendlyFire { get; set; } = false;
+    public bool bEnableAimAssistPad { get; set; } = true;
+    public bool bEnableAimAssistKeyboard { get; set; } = false;
+    public bool bAutoResetGuildNoOnlinePlayers { get; set; } = false;
+    public double AutoResetGuildTimeNoOnlinePlayers { get; set; } = 72;
     public double WorkSpeedRate { get; set; } = 1;
     public int autoSaveSpan { get; set; } = 30;
     public bool bIsMultiplay { get; set; } = false;
     public bool bIsPvP { get; set; } = false;
     public bool bHardcore { get; set; } = false;
-    public bool bPalLost { get; set; } = false;
     public bool bCanPickupOtherGuildDeathPenaltyDrop { get; set; } = false;
     public bool bEnableNonLoginPenalty { get; set; } = true;
-    public bool bEnableFastTravel { get; set; } = true;
     public bool bIsStartLocationSelectByMap { get; set; } = true;
     public bool bExistPlayerAfterLogout { get; set; } = false;
     public bool bEnableDefenseOtherGuildPlayer { get; set; } = false;
-    public bool bInvisibleOtherGuildBaseCampAreaFX { get; set; } = false;
     public bool bBuildAreaLimit { get; set; } = false;
-    public double ItemWeightRate { get; set; } = 1;
     public int CoopPlayerMaxNum { get; set; } = 4;
-    public int ServerPlayerMaxNum { get; set; } = 32;
-    public string ServerName { get; set; } = "Default Palworld Server";
-    public string ServerDescription { get; set; } = "";
-    public int PublicPort { get; set; } = 8211;
-    public string PublicIP { get; set; } = "";
     public bool RCONEnabled { get; set; } = false;
     public int RCONPort { get; set; } = 25575;
     public string Region { get; set; } = "";
@@ -300,13 +363,23 @@ public class PalWorldSettings
     public string BanListURL { get; set; } = "https://api.palworldgame.com/api/banlist.txt";
     public bool RESTAPIEnabled { get; set; } = true;
     public int RESTAPIPort { get; set; } = 8212;
-    public bool bShowPlayerList { get; set; } = false;
-    public int ChatPostLimitPerMinute { get; set; } = 10;
     public string AllowConnectPlatform { get; set; } = "Steam";
     public bool bIsUseBackupSaveData { get; set; } = true;
     public string LogFormatType { get; set; } = "Text";
-    public int SupplyDropSpan { get; set; } = 180;
     public bool EnablePredatorBossPal { get; set; } = true;
-    public int MaxBuildingLimitNum { get; set; } = 0;
     public int ServerReplicatePawnCullDistance { get; set; } = 15000;
+
+    #endregion
+
+    public bool AreSettingsEqualExceptPassword(PalWorldSettings other)
+    {
+        var properties = typeof(PalWorldSettings).GetProperties();
+        return !(from prop in properties
+            where prop.Name != "ServerPassword" && prop.Name != "AdminPassword"
+            let value1 = prop.GetValue(this)
+            let value2 = prop.GetValue(other)
+            where value1 != null || value2 != null
+            where value1 == null || value2 == null || !value1.Equals(value2)
+            select value1).Any();
+    }
 }

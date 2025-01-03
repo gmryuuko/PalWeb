@@ -1,0 +1,28 @@
+﻿<MudGrid Class="mb-2">
+    <MudItem xs="8">
+        <MudSelect Label="@Label" Value="@Value" ValueChanged="@ValueChanged">
+            <MudSelectItem Value="true">True</MudSelectItem>
+            <MudSelectItem Value="false">False</MudSelectItem>
+        </MudSelect>
+    </MudItem>
+    <MudItem xs="4">
+        <MudText Class="mt-5" Color="ActiveValueColor">@ActiveValue</MudText>
+    </MudItem>
+</MudGrid>
+
+@code {
+
+    [Parameter]
+    public required string Label { get; set; }
+
+    [Parameter]
+    public required bool Value { get; set; }
+
+    [Parameter]
+    public EventCallback<bool> ValueChanged { get; set; }
+
+    [Parameter]
+    public bool? ActiveValue { get; set; }
+
+    private Color ActiveValueColor => Value == ActiveValue ? Color.Primary : Color.Error;
+}

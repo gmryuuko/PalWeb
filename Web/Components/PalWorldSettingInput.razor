@@ -1,0 +1,33 @@
+﻿@typeparam TValue
+@typeparam TActiveValue
+
+<MudGrid Class="mb-2">
+    <MudItem xs="8">
+        <MudTextField Value="Value"
+                      ValueChanged="ValueChanged"
+                      For="() => Value"
+                      Immediate="true"
+                      Label="@Label"/>
+    </MudItem>
+    <MudItem xs="4">
+        <MudText Class="mt-5" Color="ActiveValueColor">@ActiveValue</MudText>
+    </MudItem>
+</MudGrid>
+
+@code {
+
+    [Parameter]
+    public required string Label { get; set; }
+
+    [Parameter]
+    public required TValue Value { get; set; }
+
+    [Parameter]
+    public EventCallback<TValue> ValueChanged { get; set; }
+
+    [Parameter]
+    public TActiveValue ActiveValue { get; set; }
+
+    private Color ActiveValueColor => Value?.ToString() == ActiveValue?.ToString() ? Color.Primary : Color.Error;
+
+}
