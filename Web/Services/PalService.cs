@@ -20,6 +20,9 @@ public class PalService : IDisposable
     public PalServerInfo PalServerInfo { get; private set; } = new();
     public PalServerMetrics PalServerMetrics { get; private set; } = new();
     public List<PlayerInfo> Players { get; private set; } = [];
+    public bool IsRestarting { get; private set; } = false;
+    public string RestartLog { get; private set; } = "";
+
 
     private int _onChangeServerInfoSubscriberCount = 0;
     private Action? _onChangeServerInfo;
@@ -55,8 +58,11 @@ public class PalService : IDisposable
         }
     }
 
+    public event Action? OnChangeRestart;
+
     private void NotifyServerInfoChanged() => _onChangeServerInfo?.Invoke();
     private void NotifyPlayersChanged() => _onChangePlayers?.Invoke();
+    private void NotifyRestart() => OnChangeRestart?.Invoke();
 
     public PalService(HttpClient httpClient, IOptions<PalServiceOptions> options, ILogger<PalService> logger)
     {
@@ -247,38 +253,84 @@ public class PalService : IDisposable
 
     public async Task RestartServer()
     {
-        // run docker compose down
-        var dockerComposeDown = new Process
-        {
-            StartInfo = new ProcessStartInfo
-            {
-                FileName = "docker-compose",
-                Arguments = "down",
-                WorkingDirectory = _dockerComposeDirectory,
-                RedirectStandardOutput = true,
-                RedirectStandardError = true,
-                UseShellExecute = false,
-                CreateNoWindow = true,
-            }
-        };
-        dockerComposeDown.Start();
-        await dockerComposeDown.WaitForExitAsync();
+        IsRestarting = true;
+        RestartLog = "";
+        NotifyRestart();
 
-        // run docker compose up -d
-        var dockerComposeUp = new Process
+        try
         {
-            StartInfo = new ProcessStartInfo
+            // run docker compose down
+            var dockerComposeDown = new Process
             {
-                FileName = "docker-compose",
-                Arguments = "up -d",
-                WorkingDirectory = _dockerComposeDirectory,
-                RedirectStandardOutput = true,
-                RedirectStandardError = true,
-                UseShellExecute = false,
-                CreateNoWindow = true,
-            }
-        };
-        dockerComposeUp.Start();
+                StartInfo = new ProcessStartInfo
+                {
+                    FileName = "git",
+                    Arguments = "down",
+                    WorkingDirectory = _dockerComposeDirectory,
+                    RedirectStandardOutput = true,
+                    RedirectStandardError = true,
+                    UseShellExecute = false,
+                    CreateNoWindow = true,
+                }
+            };
+            dockerComposeDown.OutputDataReceived += (sender, args) =>
+            {
+                if (args.Data == null) return;
+                RestartLog += args.Data + Environment.NewLine;
+                NotifyRestart();
+            };
+            dockerComposeDown.ErrorDataReceived += (sender, args) =>
+            {
+                if (args.Data == null) return;
+                RestartLog += args.Data + Environment.NewLine;
+                NotifyRestart();
+            };
+
+
+            dockerComposeDown.Start();
+            dockerComposeDown.BeginOutputReadLine();
+            dockerComposeDown.BeginErrorReadLine();
+            await dockerComposeDown.WaitForExitAsync();
+
+            // run docker compose up -d
+            var dockerComposeUp = new Process
+            {
+                StartInfo = new ProcessStartInfo
+                {
+                    FileName = "git",
+                    Arguments = "up -d",
+                    WorkingDirectory = _dockerComposeDirectory,
+                    RedirectStandardOutput = true,
+                    RedirectStandardError = true,
+                    UseShellExecute = false,
+                    CreateNoWindow = true,
+                }
+            };
+            dockerComposeUp.OutputDataReceived += (sender, args) =>
+            {
+                if (args.Data == null) return;
+                RestartLog += args.Data + Environment.NewLine;
+                NotifyRestart();
+            };
+            dockerComposeUp.ErrorDataReceived += (sender, args) =>
+            {
+                if (args.Data == null) return;
+                RestartLog += args.Data + Environment.NewLine;
+                NotifyRestart();
+            };
+
+            dockerComposeUp.Start();
+            dockerComposeUp.BeginOutputReadLine();
+            dockerComposeUp.BeginErrorReadLine();
+            await dockerComposeUp.WaitForExitAsync();
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Failed to restart server");
+        }
+
+        IsRestarting = false;
+        NotifyRestart();
     }
 }
 

@@ -3,7 +3,9 @@
 @using Web.Services
 
 @inherits LayoutComponentBase
+@implements IDisposable
 
+@inject PalService PalService
 @inject ClipboardService ClipboardService
 @inject IOptions<PalServiceOptions> PalServiceOptions
 
@@ -22,12 +24,30 @@
                        OnClick="@CopyAdminCommand"/>
         <MudIconButton Icon="@(DarkLightModeButtonIcon)" Color="Color.Inherit" OnClick="@DarkModeToggle"/>
     </MudAppBar>
+
     <MudDrawer @bind-Open="_drawerOpen" ClipMode="DrawerClipMode.Always" Elevation="2">
         <NavMenu/>
     </MudDrawer>
+
     <MudOverlay @bind-Visible="_restartOverlay" DarkBackground>
-        <MudText Typo="Typo.h1">Overlay</MudText>
+        <MudPaper Class="pa-8" MinWidth="500">
+            <MudText Typo="Typo.h4">Restart Pal World Server</MudText>
+            <MudDivider Class="mt-4 mb-4"/>
+            <MudButton Disabled="PalService.IsRestarting" OnClick="@RestartServer" Color="Color.Error"
+                       Variant="Variant.Filled" Class="ma-2">
+                Restart
+            </MudButton>
+            <MudButton OnClick="() => { _restartOverlay = false; }" Variant="Variant.Filled" Class="ma-2">
+                Close
+            </MudButton>
+            <MudDivider Class="mt-4 mb-4"/>
+            <MudTextField T="string" Label="Output" Variant="Variant.Outlined"
+                          Class="mud-text-field-mono"
+                          ReadOnly="true"
+                          Lines="20"/>
+        </MudPaper>
     </MudOverlay>
+
     <MudMainContent Class="mt-16 pa-4">
         @Body
     </MudMainContent>
@@ -47,9 +67,23 @@
 
     private bool _restartOverlay = false;
 
+    private Action? _onChangeHandler;
 
     protected override void OnInitialized()
     {
+        _onChangeHandler = async void () =>
+        {
+            try
+            {
+                await InvokeAsync(StateHasChanged);
+            }
+            catch (Exception e)
+            {
+                // do nothing
+            }
+        };
+        PalService.OnChangeServerInfo += _onChangeHandler;
+
         base.OnInitialized();
 
         _theme = new()
@@ -79,6 +113,11 @@
     private void OpenRestartDialog()
     {
         _restartOverlay = !_restartOverlay;
+    }
+
+    private void RestartServer()
+    {
+        Task.Run(async () => { await PalService.RestartServer(); });
     }
 
     private readonly PaletteLight _lightPalette = new()
@@ -125,6 +164,14 @@
         true => Icons.Material.Rounded.LightMode,
         false => Icons.Material.Outlined.DarkMode,
     };
+
+    public void Dispose()
+    {
+        if (_onChangeHandler != null)
+        {
+            PalService.OnChangeServerInfo -= _onChangeHandler;
+        }
+    }
 
 }
 
