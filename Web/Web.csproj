@@ -11,6 +11,7 @@
 
   <ItemGroup>
     <PackageReference Include="MudBlazor" Version="7.*" />
+    <PackageReference Include="PeanutButter.INI" Version="3.0.335" />
   </ItemGroup>
 
 

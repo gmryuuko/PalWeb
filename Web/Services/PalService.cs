@@ -92,7 +92,22 @@ public class PalService
 
     public async Task<string> GetPalWorldSettingsAsync()
     {
-        return await File.ReadAllTextAsync(_configPath);
+        var ini = await File.ReadAllTextAsync(_configPath);
+        var iniFile = PeanutButter.INI.INIFile.FromString(ini);
+        var section = iniFile.GetSection("/Script/Pal.PalGameWorldSettings");
+        var settingsStr = section["OptionSettings"]!;
+        var settings = settingsStr.TrimStart('(').TrimEnd(')').Split(',').Select(
+            setting =>
+            {
+                var kv = setting.Split('=');
+                return (kv[0], kv[1]);
+            }).ToList();
+        foreach (var setting in settings)
+        {
+            Console.WriteLine($"{setting.Item1} = {setting.Item2}");
+        }
+
+        return ini;
     }
 }
 
