@@ -2,6 +2,7 @@
 @using Web.Services
 
 @inject PalService PalService
+@inject ClipboardService ClipboardService
 @inject ISnackbar Snackbar
 
 <PageTitle>Players</PageTitle>
@@ -29,6 +30,7 @@
             </MudTh>
             <MudTh></MudTh>
             <MudTh></MudTh>
+            <MudTh></MudTh>
         </HeaderContent>
         <RowTemplate>
             <MudTd>@context.Info.Name</MudTd>
@@ -37,8 +39,15 @@
             <MudTd>@context.Info.UserId</MudTd>
             <MudTd>@context.Info.Level</MudTd>
             <MudTd>
-                <MudButton Size="Size.Small" Color="Color.Primary" Variant="Variant.Filled">
-                    TP
+                <MudButton Size="Size.Small" Color="Color.Primary" Variant="Variant.Filled"
+                           OnClick="() => CopyTpTo(context)">
+                    TP To
+                </MudButton>
+            </MudTd>
+            <MudTd>
+                <MudButton Size="Size.Small" Color="Color.Primary" Variant="Variant.Filled"
+                           OnClick="() => CopyTpToMe(context)">
+                    TP To Me
                 </MudButton>
             </MudTd>
             <MudTd>
@@ -101,18 +110,14 @@
         }
     }
 
-    private async Task KillPlayer(PlayerRow context)
+    private async Task CopyTpTo(PlayerRow context)
     {
-        try
-        {
-            await PalService.KillPlayerAsync(context.Info.UserId);
-            Snackbar.Add("Player kicked", Severity.Success);
-            _rows.Remove(context);
-        }
-        catch (Exception e)
-        {
-            Snackbar.Add(e.Message, Severity.Error);
-        }
+        await ClipboardService.CopyToClipboardAsync($"/TeleportToPlayer {context.Info.UserId}");
+    }
+
+    private async Task CopyTpToMe(PlayerRow context)
+    {
+        await ClipboardService.CopyToClipboardAsync($"/TeleportToMe  {context.Info.UserId}");
     }
 
 }

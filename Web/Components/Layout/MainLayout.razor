@@ -1,4 +1,6 @@
-﻿@inherits LayoutComponentBase
+﻿@using Web.Services
+@inherits LayoutComponentBase
+@inject ClipboardService ClipboardService
 
 <MudThemeProvider Theme="@_theme" IsDarkMode="_isDarkMode"/>
 <MudPopoverProvider/>
@@ -10,6 +12,8 @@
                        OnClick="@((e) => DrawerToggle())"/>
         <MudText Typo="Typo.h5" Class="ml-3">Pal World GM</MudText>
         <MudSpacer/>
+        <MudIconButton Icon="@Icons.Material.Filled.AdminPanelSettings" Color="Color.Inherit"
+                       OnClick="@CopyAdminCommand"/>
         <MudIconButton Icon="@(DarkLightModeButtonIcon)" Color="Color.Inherit" OnClick="@DarkModeToggle"/>
     </MudAppBar>
     <MudDrawer @bind-Open="_drawerOpen" ClipMode="DrawerClipMode.Always" Elevation="2">
@@ -53,6 +57,11 @@
     private void DarkModeToggle()
     {
         _isDarkMode = !_isDarkMode;
+    }
+
+    private async Task CopyAdminCommand()
+    {
+        await ClipboardService.CopyToClipboardAsync("/AdminPassword");
     }
 
     private readonly PaletteLight _lightPalette = new()
