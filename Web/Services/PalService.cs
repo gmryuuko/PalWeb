@@ -254,7 +254,7 @@ public class PalService : IDisposable
     public async Task RestartServer()
     {
         IsRestarting = true;
-        RestartLog = "";
+        RestartLog = "Start\n";
         NotifyRestart();
 
         try
@@ -264,7 +264,7 @@ public class PalService : IDisposable
             {
                 StartInfo = new ProcessStartInfo
                 {
-                    FileName = "git",
+                    FileName = "docker-compose",
                     Arguments = "down",
                     WorkingDirectory = _dockerComposeDirectory,
                     RedirectStandardOutput = true,
@@ -297,7 +297,7 @@ public class PalService : IDisposable
             {
                 StartInfo = new ProcessStartInfo
                 {
-                    FileName = "git",
+                    FileName = "docker-compose",
                     Arguments = "up -d",
                     WorkingDirectory = _dockerComposeDirectory,
                     RedirectStandardOutput = true,
