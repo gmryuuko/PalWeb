@@ -239,7 +239,8 @@
                 @*     Label="管理员密码"/> *@
             </MudForm>
 
-            <MudButton Variant="Variant.Filled" Color="Color.Primary" DropShadow="false" Class="mt-6">
+            <MudButton Variant="Variant.Filled" Color="Color.Primary" DropShadow="false" Class="mt-6"
+                       OnClick="SaveSettings">
                 Save
             </MudButton>
         </MudPaper>
@@ -264,14 +265,16 @@
         }
     }
 
-    private async Task EditSettings()
-    {
-        Snackbar.Add("Not Implemented", Severity.Error);
-    }
-
     private async Task SaveSettings()
     {
-        Snackbar.Add("Not Implemented", Severity.Error);
+        try
+        {
+            await PalService.SetPalWorldSettingsAsync(_settings!);
+        }
+        catch (Exception e)
+        {
+            Snackbar.Add(e.Message, Severity.Error);
+        }
     }
 
 }

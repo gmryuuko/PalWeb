@@ -134,6 +134,12 @@ public class PalService
 
         return palWorldSettings;
     }
+
+    public async Task SetPalWorldSettingsAsync(PalWorldSettings settings)
+    {
+        var ini = settings.ToIni();
+        await File.WriteAllTextAsync(_configPath, ini);
+    }
 }
 
 public class PalServerInfo
@@ -381,5 +387,40 @@ public class PalWorldSettings
             where value1 != null || value2 != null
             where value1 == null || value2 == null || !value1.Equals(value2)
             select value1).Any();
+    }
+
+    public string ToIni()
+    {
+        var properties = typeof(PalWorldSettings).GetProperties();
+        List<string> settings = [];
+        foreach (var prop in properties)
+        {
+            var value = prop.GetValue(this);
+            if (value == null)
+            {
+                continue;
+            }
+
+            if (prop.PropertyType == typeof(string))
+            {
+                if ((string)value != "None")
+                {
+                    value = $"\"{value}\"";
+                }
+            }
+            else if (prop.PropertyType == typeof(bool))
+            {
+                value = (bool)value ? "True" : "False";
+            }
+            else if (prop.PropertyType == typeof(double))
+            {
+                value = ((double)value).ToString("F6");
+            }
+
+            settings.Add($"{prop.Name}={value}");
+        }
+
+
+        return $"[/Script/Pal.PalGameWorldSettings]\nOptionSettings=({string.Join(",", settings)})";
     }
 }
