@@ -90,7 +90,7 @@ public class PalService
         return (await _httpClient.GetFromJsonAsync<PalWorldSettings>(GetUrl("v1/api/settings")))!;
     }
 
-    public async Task<string> GetPalWorldSettingsAsync()
+    public async Task<PalWorldSettings> GetPalWorldSettingsAsync()
     {
         var ini = await File.ReadAllTextAsync(_configPath);
         var iniFile = PeanutButter.INI.INIFile.FromString(ini);
@@ -102,12 +102,37 @@ public class PalService
                 var kv = setting.Split('=');
                 return (kv[0], kv[1]);
             }).ToList();
-        foreach (var setting in settings)
+
+        var palWorldSettings = new PalWorldSettings();
+        var palWorldSettingsType = typeof(PalWorldSettings);
+        foreach (var (key, value) in settings)
         {
-            Console.WriteLine($"{setting.Item1} = {setting.Item2}");
+            var prop = palWorldSettingsType.GetProperty(key);
+            if (prop == null)
+            {
+                continue;
+            }
+
+            if (prop.PropertyType == typeof(string))
+            {
+                var trimmedValue = value.Trim('"');
+                prop.SetValue(palWorldSettings, trimmedValue);
+            }
+            else if (prop.PropertyType == typeof(double))
+            {
+                prop.SetValue(palWorldSettings, double.Parse(value));
+            }
+            else if (prop.PropertyType == typeof(int))
+            {
+                prop.SetValue(palWorldSettings, int.Parse(value));
+            }
+            else if (prop.PropertyType == typeof(bool))
+            {
+                prop.SetValue(palWorldSettings, bool.Parse(value));
+            }
         }
 
-        return ini;
+        return palWorldSettings;
     }
 }
 
