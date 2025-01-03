@@ -97,8 +97,6 @@ public class PalService : IDisposable
                         PalServerMetrics = newPalServerMetrics;
                         NotifyServerInfoChanged();
                     }
-
-                    _logger.LogInformation("Server info and metrics updated");
                 }
                 catch (Exception e)
                 {
@@ -111,13 +109,15 @@ public class PalService : IDisposable
                 try
                 {
                     var newPlayers = await GetPlayersAsync();
-                    if (!Players.SequenceEqual(newPlayers))
+                    if (
+                        Players.Count != newPlayers.Count ||
+                        Players.Where((player, i) => !player.IsSamePlayer(newPlayers[i])).Any()
+                    )
                     {
+                        _logger.LogInformation("Players changed");
                         Players = newPlayers;
                         NotifyPlayersChanged();
                     }
-
-                    _logger.LogInformation("Players updated");
                 }
                 catch (Exception e)
                 {
@@ -355,6 +355,11 @@ public class PlayerInfo
 
     [JsonPropertyName("building_count")]
     public int BuildingCount { get; set; }
+
+    public bool IsSamePlayer(PlayerInfo other)
+    {
+        return UserId == other.UserId;
+    }
 }
 
 public class KickPlayerRequest

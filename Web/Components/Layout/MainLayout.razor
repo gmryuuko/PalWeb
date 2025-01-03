@@ -1,6 +1,11 @@
-﻿@using Web.Services
+﻿@using Microsoft.Extensions.Options
+@using Web.Configurations
+@using Web.Services
+
 @inherits LayoutComponentBase
+
 @inject ClipboardService ClipboardService
+@inject IOptions<PalServiceOptions> PalServiceOptions
 
 <MudThemeProvider Theme="@_theme" IsDarkMode="_isDarkMode"/>
 <MudPopoverProvider/>
@@ -68,7 +73,7 @@
 
     private async Task CopyAdminCommand()
     {
-        await ClipboardService.CopyToClipboardAsync("/AdminPassword");
+        await ClipboardService.CopyToClipboardAsync($"/AdminPassword {PalServiceOptions.Value.Password}");
     }
 
     private void OpenRestartDialog()
